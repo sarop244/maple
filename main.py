@@ -1,26 +1,28 @@
-# from logging.config import listen
+from sre_parse import State
 from pynput import mouse        #윈도우 전체화면을 이용해 마우스좌표
-from PIL import Image           #이미지 불러오기
-from tkinter import*
-# from matplotlib.backend_bases import MouseEvent
+import PIL.Image           #이미지 불러오기
+from tkinter import*            #GUI
 from pyparsing import col       #GUI
 import pytesseract              #문자인식
 import pyautogui                #스크린샷
-
-#클릭했을시
+import threading                #쓰레드
+import winsound as sd           #알림음
+import re
+#버튼1 경뿌찾는중 클릭했을시
 def clicked1():
     if btn1['text'] == '경뿌 찾기':
         btn1['text'] ='경뿌 찾는중'
         btn1['bg'] = 'green'
         btn1['fg'] = 'white'
 
-        # label=Label()
-        # for 
+        Search()    #쓰레드시작
+
+    
     else:
         btn1['text'] = '경뿌 찾기'
         btn1['bg'] = 'yellow'
         btn1['fg'] = 'black'
-
+ 
 #버튼2 즉 좌표값생성버튼 클릭
 def clicked2():
     CoorList.clear()    #좌표값 초기화
@@ -65,7 +67,35 @@ def ScreenShot(wid,leng,w,x):
     img=pyautogui.screenshot('rudQN.jpg',region=(w,x,wid,leng))
 # #현재 화면 해상도 인식  #좌표지정을 위한
 # pyautogui.size()
+    
 
+#문자인식용 쓰레드
+def Search():
+    CorCal()
+    tess=pytesseract.image_to_string(PIL.Image.open('rudQN.jpg'), lang='kor+eng')
+    tess_1=re.split('\n',tess)
+    lev=0
+    for x in tess_1:
+
+        if('뿌'or'MVP'or'경뿌'or'마빌'or'채'or'ㄱㅃ'or'ㅁㅂ' in x):
+            # print('경있음')
+            # beepsound()
+            lev=1
+            print(tess_1)
+
+    if(btn1['text']!='경뿌 찾기'):
+        #쓰레드시작
+        threading.Timer(5,Search).start()
+        if(lev==1):
+            beepsound()
+
+
+def beepsound():
+    fr = 300    # range : 37 ~ 32767
+    du = 500     # 1000 ms ==1second
+    sd.Beep(fr, du) # winsound.Beep(frequency, duration)
+
+#main
 #화면 생성
 tk=Tk() 
 tk.title("경뿌 알리미")   #제목
@@ -81,19 +111,21 @@ label = Label(tk,text='경뿌 채팅창')
 btn1 = Button(tk, text="경뿌 찾기",bg='yellow',command=clicked1,width=20)
 btn2 = Button(tk, text='채팅창 꼭짓점 좌표 4개 누르기',command=clicked2,width=40)
 
+
+
 btn1.grid(row=0,column=1,padx=20,pady=20)  #padx 좌우여백  pady 상하여백
 btn2.grid(row=0,column=2,padx=20,pady=20)  #place 절대좌표 pack 상대위치 grid 액자형
+
+#tesseract 문자인식
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+
+
+
 
 #메인루프실행
 tk.mainloop()
 
-
-
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
-
-# f=open('rud.txt','w')
-
-# f.write(pytesseract.image_to_string(Image.open('rudQN.jpg'), lang='kor+eng'))
 
 
 
