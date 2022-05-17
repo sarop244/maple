@@ -8,20 +8,23 @@ import pyautogui                #스크린샷
 import threading                #쓰레드
 import winsound as sd           #알림음
 import re
+
+def clicked3():
+    print('멈춰')
+
+
+def clicked1_2():
+    btn1['text'] = '경뿌 찾기'
+    btn1['bg'] = 'yellow'
+    btn1['fg'] = 'black'
+    print('끝')
+
 #버튼1 경뿌찾는중 클릭했을시
 def clicked1():
-    if btn1['text'] == '경뿌 찾기':
-        btn1['text'] ='경뿌 찾는중'
-        btn1['bg'] = 'green'
-        btn1['fg'] = 'white'
 
-        Search()    #쓰레드시작
+    Search()
 
-    
-    else:
-        btn1['text'] = '경뿌 찾기'
-        btn1['bg'] = 'yellow'
-        btn1['fg'] = 'black'
+
  
 #버튼2 즉 좌표값생성버튼 클릭
 def clicked2():
@@ -67,16 +70,22 @@ def ScreenShot(wid,leng,w,x):
     img=pyautogui.screenshot('rudQN.jpg',region=(w,x,wid,leng))
 # #현재 화면 해상도 인식  #좌표지정을 위한
 # pyautogui.size()
-    
 
-#문자인식용 쓰레드
+#쓰레드
+def thread_1():
+    t=threading.Timer(5,Search)
+    t.daemon = True
+    t.start()
+
+
+#문자인식용 쓰레드반복
 def Search():
     CorCal()
     tess=pytesseract.image_to_string(PIL.Image.open('rudQN.jpg'), lang='kor+eng')
     tess_1=re.split('\n',tess)
     lev=0
     for x in tess_1:
-
+        
         if('뿌'or'MVP'or'경뿌'or'마빌'or'채'or'ㄱㅃ'or'ㅁㅂ' in x):
             # print('경있음')
             # beepsound()
@@ -85,7 +94,8 @@ def Search():
 
     if(btn1['text']!='경뿌 찾기'):
         #쓰레드시작
-        threading.Timer(5,Search).start()
+        thread_1()
+        #threading.Timer(5,t).start()
         if(lev==1):
             beepsound()
 
@@ -107,10 +117,14 @@ CoorList=[]
 
 label = Label(tk,text='경뿌 채팅창')
 
+# t=threading.Timer(5,clicked1)
+# t.daemon = True
+# t.start()
+
 #fg 글자색 bg 배경색
 btn1 = Button(tk, text="경뿌 찾기",bg='yellow',command=clicked1,width=20)
 btn2 = Button(tk, text='채팅창 꼭짓점 좌표 4개 누르기',command=clicked2,width=40)
-
+btn3 = Button(tk, text='멈춰',command=clicked3,width=20)
 
 
 btn1.grid(row=0,column=1,padx=20,pady=20)  #padx 좌우여백  pady 상하여백
