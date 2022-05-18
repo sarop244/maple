@@ -13,7 +13,8 @@ import re
 
 
 def clicked1():
-
+    if(btn1['text']=='경뿌 찾기'):
+        btn1['text']='경뿌 찾는중'
         Search()    #쓰레드시작
 
     
@@ -26,7 +27,9 @@ def clicked2():
             listener.join()
 
 def clicked3():
-    print('멈춰')
+    if(btn1['text']=='경뿌 찾는중'):
+        #Search()=False
+        print('멈춰')
 
 #마우스 버튼 2  클릭시
 def MouseClick(x,y,button,pressed):
@@ -82,9 +85,10 @@ def Search():
 
         #쓰레드시작
 
-    t=threading.Timer(5,clicked1)
+    t=threading.Timer(5,Search)
     t.daemon=True
     t.start()
+    
     if(lev==1):
         beepsound()
 
